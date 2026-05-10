@@ -1,19 +1,15 @@
-import React, { useEffect, useState } from "react";
-import client from "../api/client";
-import Header from "./Header";
+import { useEffect, useState } from "react";
+import API from "../services/api";
 
 function EmployeeList() {
   const [employees, setEmployees] = useState([]);
 
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
-
+  // Fetch Employees
   const fetchEmployees = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await client.get("/employees/", {
+      const response = await API.get("/employees", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -24,33 +20,59 @@ function EmployeeList() {
       setEmployees(response.data);
     } catch (error) {
       console.log(error);
+
+      alert("Failed to fetch employees");
     }
   };
 
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
   return (
-    <div style={{ padding: "20px" }}>
-      <Header />
+    <div
+      style={{
+        textAlign: "center",
+        marginTop: "40px",
+      }}
+    >
+      <h1>Employee List</h1>
 
-      <h1>Employees</h1>
+      <table
+        border="1"
+        cellPadding="10"
+        style={{
+          width: "80%",
+          margin: "auto",
+          marginTop: "30px",
+        }}
+      >
+        <thead>
+          <tr>
+            <th>ID</th>
 
-      {employees.map((emp) => (
-        <div
-          key={emp.id}
-          style={{
-            border: "1px solid black",
-            padding: "10px",
-            marginBottom: "10px",
-          }}
-        >
-          <h3>{emp.name}</h3>
+            <th>Name</th>
 
-          <p>{emp.email}</p>
+            <th>Email</th>
 
-          <p>{emp.designation}</p>
+            <th>Department</th>
+          </tr>
+        </thead>
 
-          <p>{emp.phone}</p>
-        </div>
-      ))}
+        <tbody>
+          {employees.map((employee) => (
+            <tr key={employee.id}>
+              <td>{employee.id}</td>
+
+              <td>{employee.name}</td>
+
+              <td>{employee.email}</td>
+
+              <td>{employee.department}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

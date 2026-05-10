@@ -1,8 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
-import EmployeeList from "./components/EmployeeList";
-import CreateEmployeePage from "./components/CreateEmployeePage";
+import EmployeeList from "./pages/Employees";
 
 function App() {
   return (
@@ -11,8 +10,6 @@ function App() {
         <Route path="/" element={<Login />} />
 
         <Route path="/employees" element={<EmployeeList />} />
-
-        <Route path="/create-employee" element={<CreateEmployeePage />} />
       </Routes>
     </BrowserRouter>
   );

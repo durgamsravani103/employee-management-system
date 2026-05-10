@@ -1,31 +1,40 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+
 import API from "../services/api";
 
 function Login() {
-  const navigate = useNavigate();
-
   const [username, setUsername] = useState("");
+
   const [password, setPassword] = useState("");
+
+  // AUTO LOGIN CHECK
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      window.location.href = "/employees";
+    }
+  }, []);
+
+  // LOGIN FUNCTION
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
       const response = await API.post("/auth/login", {
-        username: username,
-        password: password,
+        username,
+        password,
       });
-
-      console.log(response.data);
 
       localStorage.setItem("token", response.data.access_token);
 
-      alert("Login Success");
+      alert("Login Successful ✅");
 
-      navigate("/employees");
+      window.location.href = "/employees";
     } catch (error) {
-      console.log(error.response);
+      console.log(error);
 
       alert("Login Failed");
     }
