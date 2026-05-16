@@ -4,18 +4,21 @@ import API from "../services/api";
 function EmployeeList() {
   const [employees, setEmployees] = useState([]);
 
-  // Fetch Employees
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [phone, setPhone] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
+
   const fetchEmployees = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await API.get("/employees", {
+      const response = await API.get("/employees/", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log(response.data);
 
       setEmployees(response.data);
     } catch (error) {
@@ -29,24 +32,118 @@ function EmployeeList() {
     fetchEmployees();
   }, []);
 
-  return (
-    <div
-      style={{
-        textAlign: "center",
-        marginTop: "40px",
-      }}
-    >
-      <h1>Employee List</h1>
+  const handleAddEmployee = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-      <table
-        border="1"
-        cellPadding="10"
-        style={{
-          width: "80%",
-          margin: "auto",
-          marginTop: "30px",
-        }}
-      >
+      await API.post(
+        "/employees/",
+        {
+          name,
+          email,
+          designation,
+          phone,
+          department_id: Number(departmentId),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      alert("Employee Added Successfully");
+
+      setName("");
+      setEmail("");
+      setDesignation("");
+      setPhone("");
+      setDepartmentId("");
+
+      fetchEmployees();
+    } catch (error) {
+      console.log(error);
+
+      alert("Operation Failed");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await API.delete(`/employees/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      alert("Employee Deleted");
+
+      fetchEmployees();
+    } catch (error) {
+      console.log(error);
+
+      alert("Delete Failed");
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+
+    window.location.href = "/";
+  };
+
+  return (
+    <div className="container">
+      <h1>Employee Dashboard</h1>
+
+      <button className="logout-btn" onClick={handleLogout}>
+        Logout
+      </button>
+
+      <div>
+        <input
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Designation"
+          value={designation}
+          onChange={(e) => setDesignation(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Phone"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+
+        <input
+          type="number"
+          placeholder="Department ID"
+          value={departmentId}
+          onChange={(e) => setDepartmentId(e.target.value)}
+        />
+
+        <br />
+
+        <button onClick={handleAddEmployee}>Add Employee</button>
+      </div>
+
+      <table>
         <thead>
           <tr>
             <th>ID</th>
@@ -55,7 +152,13 @@ function EmployeeList() {
 
             <th>Email</th>
 
-            <th>Department</th>
+            <th>Designation</th>
+
+            <th>Phone</th>
+
+            <th>Department ID</th>
+
+            <th>Actions</th>
           </tr>
         </thead>
 
@@ -68,7 +171,17 @@ function EmployeeList() {
 
               <td>{employee.email}</td>
 
-              <td>{employee.department}</td>
+              <td>{employee.designation}</td>
+
+              <td>{employee.phone}</td>
+
+              <td>{employee.department_id}</td>
+
+              <td className="actions">
+                <button onClick={() => handleDelete(employee.id)}>
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
